@@ -97,7 +97,7 @@ impl MoveGenerator {
         if depth == 0 {
             return (Self::evaluate_state(&boardstate), None)
         } else {
-            
+            /*
             if let Some(entry) = self.transposition_table.get(boardstate, depth) {
                 match entry.node_bound {
                     NodeBound::Exact => { return (entry.score, Some(entry.entry_move)) },
@@ -111,7 +111,7 @@ impl MoveGenerator {
             } else {
                 None
 
-            };
+            };*/
             let mut legal_moves = boardstate.calculate_active_player_legal_moves();
             if legal_moves.len() == 0 {
                 return (-1_000_000 + depth, None);
@@ -138,6 +138,7 @@ impl MoveGenerator {
 
 
             }
+            /*
             
             self.transposition_table.insert(
                     boardstate, 
@@ -146,6 +147,7 @@ impl MoveGenerator {
                     depth,
                     alpha,
                     beta);
+            */  
             return (best_score, best_move);
 
         }
