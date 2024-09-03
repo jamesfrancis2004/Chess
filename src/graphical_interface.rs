@@ -136,7 +136,7 @@ impl GraphicalBoard {
                         self.possible_moves = None;
                         let (_score, new_move) = self.move_generator.alpha_beta(&mut self.boardstate, 7);
                         self.boardstate.move_piece(new_move.unwrap());
-                        println!("{}", self.move_generator.node_count);
+                        //println!("{}", self.move_generator.node_count);
                         //self.ai_move = true;
                         return;
                     }
