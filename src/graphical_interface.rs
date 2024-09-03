@@ -42,6 +42,7 @@ pub struct GraphicalBoard {
     black_rook: egui::TextureHandle,
     possible_moves: Option<HashMap<Position, Vec<(Position, game_move::Move)>>>,
     selected_piece: Option<Position>,
+    move_generator: MoveGenerator,
 }
 
 
@@ -73,7 +74,7 @@ impl GraphicalBoard {
             black_rook: Self::load_image_texture(&cc.egui_ctx, "../assets/black-rook.png"),
             possible_moves: None,
             selected_piece: None,
-
+            move_generator: MoveGenerator::new(),
         }
 
     }
@@ -133,11 +134,9 @@ impl GraphicalBoard {
                         //let new_move = engine::Move::new(selected_piece, move_val.0, move_val.1);
                         self.boardstate.move_piece(move_val.1);
                         self.possible_moves = None;
-                        let mut move_generator = MoveGenerator::new();
-                        let (score, new_move) = move_generator.alpha_beta(&mut self.boardstate, 8);
+                        let (_score, new_move) = self.move_generator.alpha_beta(&mut self.boardstate, 7);
                         self.boardstate.move_piece(new_move.unwrap());
-
-
+                        println!("{}", self.move_generator.node_count);
                         //self.ai_move = true;
                         return;
                     }
@@ -228,6 +227,7 @@ impl GraphicalBoard {
         
         for x in 0..8 {
             for y in 0..8 {
+                let y_pos = 7 - y;
                 let y_pos = if self.boardstate.active_player == engine::Player::Black {
                     y
                 } else {
@@ -241,9 +241,9 @@ impl GraphicalBoard {
                         tile_dims,
                 );
                 let colour = if (y % 2 == 0 && x % 2 == 0) || (y % 2 == 1 && x % 2 == 1) {
-                    white
-                } else {
                     green
+                } else {
+                    white
                 };
                 ui.painter().rect(rect, 0.0, colour, stroke);
                 self.render_possible_pieces(ui, rect, bitboard::BitBoard::from_pos(x, y)); 

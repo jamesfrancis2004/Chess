@@ -3,6 +3,17 @@ name = "better_chess"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release]
+opt-level = 2
+debug=false
+lto = "fat"
+panic="abort"
+codegen-units = 1
+rpath=false
+march="native"
+incremental = false
+overflow-checks=false
+
 
 [dependencies]
 eframe = "0.27.2"
@@ -10,6 +21,7 @@ image="0.25.1"
 indexmap = "2.3.0"
 rand = "0.8.5"
 rayon = "1.10.0"
+
 
 
 

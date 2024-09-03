@@ -5,6 +5,9 @@ mod magic_bitboard;
 mod game_move;
 mod graphical_interface;
 mod move_generator;
+mod eval_constants;
+mod transposition_table;
+mod zobrist_table;
 
 use std::time::Instant;
 
@@ -13,11 +16,13 @@ use std::time::Instant;
 
 
 fn main() {
-    let engine = engine::BoardState::new();
-    let start = Instant::now();
+    let mut engine = engine::BoardState::new();
     let mut move_generator = move_generator::MoveGenerator::new();
-    //let (score, new_move, engine) = move_generator.alpha_beta(engine, 10);
-    //let (old_pos, new_pos, move_type) = new_move.unwrap().get();
+
+    let start = Instant::now();
+    //let mut move_generator = move_generator::MoveGenerator::new();
+    let (score, new_move) = move_generator.alpha_beta(&mut engine, 7);
+    let (old_pos, new_pos, move_type) = new_move.unwrap().get();
     println!("{}", move_generator.node_count);
     //println!("old pos");
     //println!("{}", old_pos);
