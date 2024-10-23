@@ -1,5 +1,6 @@
-use crate::game_move::Move;
 use crate::engine::BoardState;
+use crate::game_move::Move;
+use std::collections::HashSet;
 
 const TABLE_SIZE: usize = 10_000_000;
 
@@ -38,6 +39,7 @@ impl TableEntry {
 
 pub struct TranspositionTable {
     entries: Vec<Option<TableEntry>>,
+    pub move_table: HashSet<Move>,
     pub used_entries: usize,
 }
 
@@ -47,6 +49,7 @@ impl TranspositionTable {
     pub fn new() -> Self {
         Self {
             entries: vec![None; TABLE_SIZE],
+            move_table: HashSet::new(),
             used_entries: 0,
         }
     }
@@ -64,6 +67,10 @@ impl TranspositionTable {
         }
     }
 
+    pub fn contains_move(&self, game_move: &Move) -> bool {
+        self.move_table.contains(game_move)
+    }
+
     pub fn insert(&mut self, 
         boardstate: &BoardState, 
         game_move: Move,
@@ -71,6 +78,7 @@ impl TranspositionTable {
         depth: i64,
         alpha: i64,
         beta: i64) {
+        self.move_table.insert(game_move);
         let idx = boardstate.zobrist_key % (TABLE_SIZE as u64);
         let node_type = if move_score <= alpha {
             NodeBound::UpperBound

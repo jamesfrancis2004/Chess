@@ -65,7 +65,7 @@ impl MoveGenerator {
     }
 
 
-    fn sort_legal_moves(legal_moves: &mut Vec<Move>, boardstate: &BoardState) {
+    fn sort_legal_moves(&self, legal_moves: &mut Vec<Move>, boardstate: &BoardState) {
         let (active_list, enemy_list) = if boardstate.active_player == Player::White {
                 (&boardstate.white_pieces, &boardstate.black_pieces)
         } else {
@@ -76,12 +76,14 @@ impl MoveGenerator {
             let (old_pos, new_pos, _) = x.get();
             let attacker_idx = active_list.get(&old_pos).unwrap().piece_type as usize;
             let victim = enemy_list.get(&new_pos);
-            let victim_idx = if let Some(victim) = victim {
-                victim.piece_type as usize
+            if self.transposition_table.contains_move(&x) {
+                120
+            }
+            else if let Some(victim) = victim {
+                MVV_LVA[victim.piece_type as usize][attacker_idx]
             } else {
-                6
-            };
-            MVV_LVA[victim_idx][attacker_idx]
+                MVV_LVA[6][attacker_idx]
+            }
         });
         legal_moves.reverse();
     }
@@ -97,26 +99,22 @@ impl MoveGenerator {
         if depth == 0 {
             return (Self::evaluate_state(&boardstate), None)
         } else {
-            /*
+            
             if let Some(entry) = self.transposition_table.get(boardstate, depth) {
                 match entry.node_bound {
                     NodeBound::Exact => { return (entry.score, Some(entry.entry_move)) },
                     NodeBound::LowerBound => { alpha = *[alpha, entry.score].iter().max().unwrap(); }
                     NodeBound::UpperBound => { beta = *[beta, entry.score].iter().min().unwrap(); }
                 }
-                if alpha >= beta {
-                    return (entry.score, Some(entry.entry_move));
-                }
-                Some(entry.entry_move)
-            } else {
-                None
+                return (entry.score, Some(entry.entry_move));
+                //Some(entry.entry_move)
+            };
 
-            };*/
             let mut legal_moves = boardstate.calculate_active_player_legal_moves();
             if legal_moves.len() == 0 {
-                return (-1_000_000 + depth, None);
+                return (1_000_000 - depth, None);
             }
-            Self::sort_legal_moves(&mut legal_moves, &boardstate);
+            self.sort_legal_moves(&mut legal_moves, &boardstate);
             let mut best_score = std::i64::MIN;
             let mut best_move = None;
 
@@ -138,8 +136,6 @@ impl MoveGenerator {
 
 
             }
-            /*
-            
             self.transposition_table.insert(
                     boardstate, 
                     best_move.clone().unwrap(), 
@@ -147,7 +143,6 @@ impl MoveGenerator {
                     depth,
                     alpha,
                     beta);
-            */  
             return (best_score, best_move);
 
         }
@@ -157,10 +152,14 @@ impl MoveGenerator {
 
 
     pub fn alpha_beta(&mut self, boardstate: &mut BoardState, depth: i64) -> (i64, Option<Move>) {
-        self.node_count = 0;
-        let to_return = self.nega_max(boardstate, depth, -1_000_000, 1_000_000);
-        println!("Used entries {}", self.transposition_table.used_entries);
-        to_return
+        let mut to_return = (0, None);
+        for cur_depth in 1..(depth+1) {
+            self.node_count = 0;
+            to_return = self.nega_max(boardstate, cur_depth, -1_000_000, 1_000_000);
+        }
+        return self.nega_max(boardstate, depth, -1_000_000, 1_000_000);
+
+        //to_return
 
     }
 

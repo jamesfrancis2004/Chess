@@ -43,13 +43,15 @@ pub struct GraphicalBoard {
     possible_moves: Option<HashMap<Position, Vec<(Position, game_move::Move)>>>,
     selected_piece: Option<Position>,
     move_generator: MoveGenerator,
+    ai_move: bool,
+    ai_rendered: bool,
 }
 
 
 impl GraphicalBoard {
 
-    fn load_image_texture(ctx: &egui::Context, path: &str) -> egui::TextureHandle {
-            let image = image::open(path).expect("Failed to load image");
+    fn load_image_texture(ctx: &egui::Context, bytes: &'static [u8]) -> egui::TextureHandle {
+            let image = image::load_from_memory(bytes).expect("Failed to load image");
             let size = [image.width() as _, image.height() as _];
             let pixels = image.to_rgba8().into_raw();
             let color_image = egui::ColorImage::from_rgba_unmultiplied(size, &pixels);
@@ -60,21 +62,23 @@ impl GraphicalBoard {
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         Self {
             boardstate: engine::BoardState::new(),
-            white_pawn: Self::load_image_texture(&cc.egui_ctx, "../assets/white-pawn.png"),
-            black_pawn: Self::load_image_texture(&cc.egui_ctx, "../assets/black-pawn.png"),
-            white_knight: Self::load_image_texture(&cc.egui_ctx, "../assets/white-knight.png"),
-            black_knight: Self::load_image_texture(&cc.egui_ctx, "../assets/black-knight.png"),
-            white_bishop: Self::load_image_texture(&cc.egui_ctx, "../assets/white-bishop.png"),
-            black_bishop: Self::load_image_texture(&cc.egui_ctx, "../assets/black-bishop.png"),
-            white_queen: Self::load_image_texture(&cc.egui_ctx, "../assets/white-queen.png"),
-            black_queen: Self::load_image_texture(&cc.egui_ctx, "../assets/black-queen.png"),
-            white_king: Self::load_image_texture(&cc.egui_ctx, "../assets/white-king.png"),
-            black_king: Self::load_image_texture(&cc.egui_ctx, "../assets/black-king.png"),
-            white_rook: Self::load_image_texture(&cc.egui_ctx, "../assets/white-rook.png"),
-            black_rook: Self::load_image_texture(&cc.egui_ctx, "../assets/black-rook.png"),
+            white_pawn: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/white-pawn.png")),
+            black_pawn: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/black-pawn.png")),
+            white_knight: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/white-knight.png")),
+            black_knight: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/black-knight.png")),
+            white_bishop: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/white-bishop.png")),
+            black_bishop: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/black-bishop.png")),
+            white_queen: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/white-queen.png")),
+            black_queen: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/black-queen.png")),
+            white_king: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/white-king.png")),
+            black_king: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/black-king.png")),
+            white_rook: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/white-rook.png")),
+            black_rook: Self::load_image_texture(&cc.egui_ctx, include_bytes!("../assets/black-rook.png")),
             possible_moves: None,
             selected_piece: None,
             move_generator: MoveGenerator::new(),
+            ai_move: false,
+            ai_rendered: false
         }
 
     }
@@ -134,9 +138,9 @@ impl GraphicalBoard {
                         //let new_move = engine::Move::new(selected_piece, move_val.0, move_val.1);
                         self.boardstate.move_piece(move_val.1);
                         self.possible_moves = None;
-                        let (_score, new_move) = self.move_generator.alpha_beta(&mut self.boardstate, 7);
+                        let (_score, new_move) = self.move_generator.alpha_beta(&mut self.boardstate, 6);
                         self.boardstate.move_piece(new_move.unwrap());
-                        //println!("{}", self.move_generator.node_count);
+                        println!("{}", self.move_generator.node_count);
                         //self.ai_move = true;
                         return;
                     }
@@ -145,8 +149,6 @@ impl GraphicalBoard {
 
 
             }
-
-
         }
 
 

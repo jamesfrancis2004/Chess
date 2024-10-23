@@ -7,7 +7,7 @@ const NEW_POS_SHIFT: u64 = 3;
 const POS_MASK: u64 = 0b111111;
 const MOVE_TYPE_MASK: u64 = 0b111;
 
-#[derive(PartialEq, Eq, Copy, Clone)]
+#[derive(PartialEq, Eq, Copy, Clone, Hash)]
 pub struct Move(u64); 
 
 

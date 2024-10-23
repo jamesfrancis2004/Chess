@@ -16,14 +16,14 @@ use std::time::Instant;
 
 
 fn main() {
-    let mut engine = engine::BoardState::new();
-    let mut move_generator = move_generator::MoveGenerator::new();
-
-    let start = Instant::now();
+    //let mut engine = engine::BoardState::new();
     //let mut move_generator = move_generator::MoveGenerator::new();
-    let (score, new_move) = move_generator.alpha_beta(&mut engine, 7);
-    let (old_pos, new_pos, move_type) = new_move.unwrap().get();
-    println!("{}", move_generator.node_count);
+
+    //let start = Instant::now();
+    //let mut move_generator = move_generator::MoveGenerator::new();
+    //let (score, new_move) = move_generator.alpha_beta(&mut engine, 7);
+    //let (old_pos, new_pos, move_type) = new_move.unwrap().get();
+    //println!("{}", move_generator.node_count);
     //println!("old pos");
     //println!("{}", old_pos);
     //println!("new pos");
@@ -34,7 +34,7 @@ fn main() {
     /*for _ in 0..1_000_000 {
         engine.calculate_active_player_legal_moves();
     }*/
-    println!("{:?}", start.elapsed());
+    //println!("{:?}", start.elapsed());
     let native_options = eframe::NativeOptions::default();
     let _ = eframe::run_native("Chess",
         native_options,
